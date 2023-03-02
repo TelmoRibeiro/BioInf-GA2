@@ -1,10 +1,12 @@
 #################### Authors: #################### 
-# Diogo Ferreira # Sara Rescalli # Telmo Ribeiro #
+# Diogo Ferreira ## 201805258 ##             MCC # 
+# Sara Rescalli  ## 202210943 ##      Mobilidade #  
+# Telmo Ribeiro  ## 201805124 ##             MCC #
 ##################################################
 
 
 
-def read_file(file_name, nucleotides = 30000):
+def read_file(file_name, nucleotides):
     dna_seq = ""
     with open(file_name, 'r') as fn:    
         fn.readline()                   # consume first line
@@ -14,40 +16,40 @@ def read_file(file_name, nucleotides = 30000):
     dna_seq = dna_seq[:nucleotides]     # keep the first n nucleotides
     return dna_seq
 
-def nucleotide_frequency(dna_seq, dna_seq_len):
+def nucleotide_frequency(dna_seq):
     freq_dictionary = {}
     for nucleotide in dna_seq:
-        if nucleotide in freq_dictionary: freq_dictionary[nucleotide] += 1
+        if nucleotide in freq_dictionary: freq_dictionary[nucleotide] += 1 
         else:                             freq_dictionary[nucleotide]  = 1
     for nucleotide in freq_dictionary:
-        freq_dictionary[nucleotide] /= (dna_seq_len)
+        freq_dictionary[nucleotide] /= len(dna_seq)
     return freq_dictionary
 
 def gc_content(freq_dictionary):
     return freq_dictionary['G'] + freq_dictionary['C']
 
-def start_codon_number(dna_seq, dna_seq_len):
+def start_codon_number(dna_seq):
     counter = 0
-    for i in range(0, dna_seq_len - 2):
-        if dna_seq[i] == 'T' and dna_seq[i+1] == 'A' and dna_seq[i+2] == 'C': counter += 1
+    for i in range(0, len(dna_seq) - 2):
+        if dna_seq[i] == 'A' and dna_seq[i+1] == 'T' and dna_seq[i+2] == 'G': counter += 1
     return counter
 
-def stop_codon_number(dna_seq, dna_seq_len):
+def stop_codon_number(dna_seq):
     counter = 0
-    for i in range(0, dna_seq_len - 2):
-        if   dna_seq[i] == 'A' and dna_seq[i+1] == 'T' and dna_seq[i+2] == 'T': counter += 1
-        elif dna_seq[i] == 'A' and dna_seq[i+1] == 'T' and dna_seq[i+2] == 'C': counter += 1
-        elif dna_seq[i] == 'A' and dna_seq[i+1] == 'C' and dna_seq[i+2] == 'T': counter += 1
+    for i in range(0, len(dna_seq) - 2):
+        if   dna_seq[i] == 'T' and dna_seq[i+1] == 'A' and dna_seq[i+2] == 'A': counter += 1
+        elif dna_seq[i] == 'T' and dna_seq[i+1] == 'A' and dna_seq[i+2] == 'G': counter += 1
+        elif dna_seq[i] == 'T' and dna_seq[i+1] == 'G' and dna_seq[i+2] == 'A': counter += 1
     return counter
 
-def codon_frequency(dna_seq, dna_seq_len):
+def codon_frequency(dna_seq):
     freq_dictionary = {}
-    for i in range(0, dna_seq_len - 2):
+    for i in range(1, len(dna_seq) - 2):
         codon = dna_seq[i] + dna_seq[i+1] + dna_seq[i+2]
         if codon in freq_dictionary: freq_dictionary[codon] += 1
         else:                        freq_dictionary[codon]  = 1
-    return freq_dictionary
-
+    return (min(freq_dictionary, key=freq_dictionary.get), max(freq_dictionary, key=freq_dictionary.get))
+    
 def translate_codon(codon):
     translation_table = {
         "GCT":"A", "GCC":"A", "GCA":"A", "GCG":"A",
@@ -75,12 +77,12 @@ def translate_codon(codon):
     if codon in translation_table: return translation_table[codon]
     return None
 
-def translate_seq(dna_seq, dna_seq_len, initial_position = 0):
+def translate_seq(dna_seq, initial_position):
     translated_seq = ""
     i = initial_position
-    while i < dna_seq_len - 2:
+    while i < len(dna_seq) - 2:
         codon = dna_seq[i] + dna_seq[i+1] + dna_seq[i+2]
-        translated_seq = translated_seq + translate_codon(codon)
+        translated_seq += translate_codon(codon)
         i = i + 3
     return translated_seq
 
@@ -94,24 +96,24 @@ def nucleotide_pair(nucleotide):
     if nucleotide in pair_table: return pair_table[nucleotide]
     return None
 
-def reverse_complement(dna_seq, dna_seq_len):
+def reverse_complement(dna_seq):
     rc = ""
-    i = dna_seq_len - 1
+    i  = len(dna_seq) - 1
     while i >= 0:
-        rc = rc + nucleotide_pair(dna_seq[i])
-        i  = i - 1 
+        rc += nucleotide_pair(dna_seq[i])
+        i   = i - 1 
     return rc
 
-def reading_frames(dna_seq, dna_seq_len): 
-    result = []
-    result.append(translate_seq(dna_seq, dna_seq_len, 0))
-    result.append(translate_seq(dna_seq, dna_seq_len, 1))
-    result.append(translate_seq(dna_seq, dna_seq_len, 2))
-    rc = reverse_complement(dna_seq, dna_seq_len)
-    result.append(translate_seq(rc, dna_seq_len, 0))
-    result.append(translate_seq(rc, dna_seq_len, 1))
-    result.append(translate_seq(rc, dna_seq_len, 2))
-    return result     
+def reading_frames(dna_seq):
+    rfs = []
+    rc = reverse_complement(dna_seq)
+    rfs.append(translate_seq(dna_seq, 0))
+    rfs.append(translate_seq(dna_seq, 1))
+    rfs.append(translate_seq(dna_seq, 2))
+    rfs.append(translate_seq(rc,      0))
+    rfs.append(translate_seq(rc,      1))
+    rfs.append(translate_seq(rc,      2))
+    return rfs
 
 def all_proteins_rf(aa_seq):
     current_proteins = []
@@ -129,18 +131,15 @@ def all_proteins_rf(aa_seq):
                 current_proteins[i] += aa
     return proteins
 
-def all_orfs(dna_seq, dna_seq_len):
-    proteins_list = []
-    rfs = reading_frames(dna_seq, dna_seq_len)
-    for aa_seq in rfs:
-        proteins = all_proteins_rf(aa_seq)
-        for p in proteins:
-            if p: proteins_list.append(p)
-    return proteins_list 
+def insert_protein_ord(protein, proteins_list):
+    i = 0
+    while i < len(proteins_list) and len(protein) < len(proteins_list[i]):
+        i = i + 1
+    proteins_list.insert(i, protein)
 
-def all_orfs_ord(dna_seq, dna_seq_len, minimum_size = 0):
+def all_orfs_ord(dna_seq, minimum_size):
     proteins_list = []
-    rfs = reading_frames(dna_seq, dna_seq_len)
+    rfs = reading_frames(dna_seq)
     for aa_seq in rfs:
         proteins = all_proteins_rf(aa_seq)
         maximum_size = len(proteins[0])
@@ -149,26 +148,23 @@ def all_orfs_ord(dna_seq, dna_seq_len, minimum_size = 0):
             if len(p) > maximum_size:
                 maximum_size = len(p)
                 maximum_protein = p 
-
         if maximum_size >= minimum_size: insert_protein_ord(maximum_protein, proteins_list)
     return proteins_list    
 
-def insert_protein_ord(protein, proteins_list):
-    i = 0
-    while i < len(proteins_list) and len(protein) < len(proteins_list[i]):
-        i = i + 1
-    proteins_list.insert(i, protein)
-
 def main():
     dna_seq = read_file("sequence_chr1.fasta", 30000)
-    first   = len(dna_seq)
-    second  = nucleotide_frequency(dna_seq, first)
-    third   = gc_content(second)
-    fourth  = start_codon_number(dna_seq, first)
-    fifth   = stop_codon_number(dna_seq, first)
-    sixth   = codon_frequency(dna_seq, first)
+    print(f"Sequence Length: {len(dna_seq)}")                                       # 1st exercise
+    freq_dictionary = nucleotide_frequency(dna_seq)
+    for n in freq_dictionary:
+        print(f"{n}: {freq_dictionary[n]}\t", end = " ")                            # 2nd exercise
+    print()
+    print(f"GC Content: {gc_content(freq_dictionary)}")                             # 3rd exercise
+    print(f"Number of Start Codons: {start_codon_number(dna_seq)}")                 # 4th exercise
+    print(f"Number of Stop  Codons: {stop_codon_number(dna_seq)}")                  # 5th exercise
+    tuple = codon_frequency(dna_seq)
+    print(f"Least Frequent Codons: {tuple[0]}\tMost Frequent Codons: {tuple[1]}")   # 6th exercise
     
-    seven   = all_orfs_ord(dna_seq, first, 50)
+    seven   = all_orfs_ord(dna_seq, 50)
     print(len(seven))
     with open("all_potential_proteins.txt", "w") as fn:
         for orf in seven:
