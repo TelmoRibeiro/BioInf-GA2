@@ -235,7 +235,6 @@ def find_orfs_coords(dna_seq, minsize, rfs):
     return orfs_coords
 
 def write_coords_to_file(orfs_coords, rf_dict):
-
     file = open('orf_coordinates.txt','w')
     i = 0
     for orf in orfs_coords: 
