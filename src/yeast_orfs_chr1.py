@@ -230,8 +230,11 @@ def find_orfs_coords(dna_seq, minsize, rfs):
                 start_index = 0
                 first = False
                 end_index = 0
-                
-    rf_dict = {1:"+1", 2:"+2", 3:"+3", 4:"-1", 5:"-2", 6:"-3"}
+    
+    # return list of ORFs & coordinates
+    return orfs_coords
+
+def write_coords_to_file(orfs_coords, rf_dict):
 
     file = open('orf_coordinates.txt','w')
     i = 0
@@ -242,9 +245,6 @@ def find_orfs_coords(dna_seq, minsize, rfs):
         i += 1
         file.write(orf_start + ", " + orf_end + ", " + "ORF" + str(i) + "    " + rf_dict[orf[2]] + ", " + " length:" + length + "\n")
     file.close()
-
-    # return list of ORFs & coordinates
-    return orfs_coords
 ##############################################
 
 ##############################################
@@ -288,7 +288,11 @@ def main():
     dna_seq = read_file(genome, 30000)
     rfs = all_reading_frames(dna_seq)
 
+    rf_dict = {1:"+1", 2:"+2", 3:"+3", 4:"-1", 5:"-2", 6:"-3"}
+    nf = 0
     for rf in rfs:
+        nf += 1
+        print("Reading Frame: ", rf_dict[nf])
         print(f"Sequence Length: {len(rf)}")                                       # 1st exercise
         freq_dictionary = nucleotide_frequency(rf)
         for n in freq_dictionary:
@@ -309,6 +313,8 @@ def main():
         fn.close()
 
     orf_coords = find_orfs_coords(dna_seq, 150, rfs)                     # 8th exercise
+    write_coords_to_file(orf_coords, rf_dict)
+    
     annot = sys.argv[2]
     overlap(orf_coords, annot)                                           # 9th exercise
 
