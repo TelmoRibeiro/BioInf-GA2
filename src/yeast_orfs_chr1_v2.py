@@ -231,7 +231,7 @@ def find_orfs_coords(dna_seq, minsize, rfs):
     # return list of ORFs & coordinates
     return orfs_coords
 
-def write_coords_to_file(orfs_coords, rf_dict):
+def write_coords_to_file(orfs_coords):
     file = open('orf_coordinates.txt','w')
     i = 0
     for orf in orfs_coords: 
@@ -239,7 +239,7 @@ def write_coords_to_file(orfs_coords, rf_dict):
         orf_end = str(orf[1])
         length = str(abs(orf[1] - orf[0]) + 1)
         i += 1
-        file.write(orf_start + ", " + orf_end + ", " + "ORF" + str(i) + "    " + rf_dict[orf[2]] + ", " + " length:" + length + "\n")
+        file.write(orf_start + ", " + orf_end + ", " + "ORF" + str(i) + ", " + "length:" + length + "\n")
     file.close()
 ##############################################
 
@@ -304,7 +304,7 @@ def main():
     all_orfs_ord(rfs)
     
     orf_coords = find_orfs_coords(dna_seq, 150, rfs)                     # 8th exercise
-    write_coords_to_file(orf_coords, rf_dict)
+    write_coords_to_file(orf_coords)
     
     annot = sys.argv[2]
     overlap(orf_coords, annot)                                           # 9th exercise
