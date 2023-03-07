@@ -164,36 +164,26 @@ def insert_protein_ord(protein, proteins_list):
         i = i + 1
     proteins_list.insert(i, protein)
 
-def all_orfs_ord(rfs, minimum_size):
+def all_orfs_ord(rfs):
     res = []
-    start_codons = ['ATG']
-    stop_codons =  ['TAA', 'TAG', 'TGA']
-    for rf in rfs:
-        start_index = 0
-        first = False
-        end_index = 0
-        for i in range(0, len(rf), 3):
-            if rf[i:i+3] in start_codons and not first:
-                start_index = i
-                first = True
+    aa_rfs = []
 
-            elif rf[i:i+3] in stop_codons and first:
-                end_index = i+2
+    for rf in rfs: 
+        aa_rfs.append(translate_seq(rf))
 
-                if abs(end_index - start_index) >= minimum_size:
-                    for p in all_proteins_rf(translate_seq(rf[start_index:end_index+1])):                 
-                        res.append(p)
+    for aa_seq in aa_rfs:
+        proteins = all_proteins_rf(aa_seq)
 
-                start_index = 0
-                first = False
-                end_index = 0
-
+        for p in proteins:
+            if len(p) >= 1: insert_protein_ord(p, res)
+    
     # print("proteins: " + str(len(res))) #
-
+    
     with open("all_potential_proteins.txt", "w") as fn:
         for orf in res:
-            fn.write(str(orf) + "\n\n")
+            fn.write(orf + "\n\n")
         fn.close()
+
 
 ##############################################
 # EXERCISE 8
@@ -237,9 +227,11 @@ def find_orfs_coords(dna_seq, minsize, rfs):
                 start_index = 0
                 first = False
                 end_index = 0
-                
-    rf_dict = {1:"+1", 2:"+2", 3:"+3", 4:"-1", 5:"-2", 6:"-3"}
+    
+    # return list of ORFs & coordinates
+    return orfs_coords
 
+def write_coords_to_file(orfs_coords, rf_dict):
     file = open('orf_coordinates.txt','w')
     i = 0
     for orf in orfs_coords: 
@@ -249,9 +241,6 @@ def find_orfs_coords(dna_seq, minsize, rfs):
         i += 1
         file.write(orf_start + ", " + orf_end + ", " + "ORF" + str(i) + "    " + rf_dict[orf[2]] + ", " + " length:" + length + "\n")
     file.close()
-
-    # return list of ORFs & coordinates
-    return orfs_coords
 ##############################################
 
 ##############################################
@@ -295,7 +284,11 @@ def main():
     dna_seq = read_file(genome, 30000)
     rfs = all_reading_frames(dna_seq)
 
+    rf_dict = {1:"+1", 2:"+2", 3:"+3", 4:"-1", 5:"-2", 6:"-3"}
+    nf = 0
     for rf in rfs:
+        nf += 1
+        print("Reading Frame: ", rf_dict[nf])
         print(f"Sequence Length: {len(rf)}")                                       # 1st exercise
         freq_dictionary = nucleotide_frequency(rf)
         for n in freq_dictionary:
@@ -308,9 +301,11 @@ def main():
         print(f"Least Frequent Codons: {tuple[0]}\tMost Frequent Codons: {tuple[1]}")   # 6th exercise
         print()
     
-    all_orfs_ord(rfs, 150)
-
+    all_orfs_ord(rfs)
+    
     orf_coords = find_orfs_coords(dna_seq, 150, rfs)                     # 8th exercise
+    write_coords_to_file(orf_coords, rf_dict)
+    
     annot = sys.argv[2]
     overlap(orf_coords, annot)                                           # 9th exercise
 
