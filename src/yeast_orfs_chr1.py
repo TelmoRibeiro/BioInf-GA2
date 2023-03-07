@@ -258,7 +258,6 @@ def write_coords_to_file(orfs_coords):
         i += 1
         file.write(orf_start + ", " + orf_end + ", " + "ORF" + str(i) + ", " + "length:" + length + "\n")
     file.close()
-##############################################
 
 ##############################################
 # EXERCISE 9 
@@ -303,27 +302,28 @@ def main():
 
     rf_dict = {1:"+1", 2:"+2", 3:"+3", 4:"-1", 5:"-2", 6:"-3"}
     nf = 0
+    # As we discussed with the professor, we are printing the 1-6 stats to each individual reading frame
     for rf in rfs:
         nf += 1
         print("Reading Frame: ", rf_dict[nf])        
-        print(f"Sequence Length: {len(rf)}")                                       # 1st exercise
+        print(f"Sequence Length: {len(rf)}")                                            # 1st exercise
         freq_dictionary = nucleotide_frequency(rf)
         for n in freq_dictionary:
-            print(f"{n}: {freq_dictionary[n]}\t", end = " ")                       # 2nd exercise
+            print(f"{n}: {freq_dictionary[n]}\t", end = " ")                            # 2nd exercise
         print()
-        print(f"GC Content: {gc_content(freq_dictionary)}")                        # 3rd exercise
-        print(f"Number of Start Codons: {start_codon_number(rf)}")                 # 4th exercise
-        print(f"Number of Stop  Codons: {stop_codon_number(rf)}")                  # 5th exercise
+        print(f"GC Content: {gc_content(freq_dictionary)}")                             # 3rd exercise
+        print(f"Number of Start Codons: {start_codon_number(rf)}")                      # 4th exercise
+        print(f"Number of Stop  Codons: {stop_codon_number(rf)}")                       # 5th exercise
         tuple = codon_frequency(rf)
         print(f"Least Frequent Codons: {tuple[0]}\tMost Frequent Codons: {tuple[1]}")   # 6th exercise
         print()
-    
-    all_orfs_ord(rfs, 150)
 
-    orf_coords = find_orfs_coords(dna_seq, 150, rfs)                     # 8th exercise
+    all_orfs_ord(rfs, 150)                                                              # 7th exercise
+
+    orf_coords = find_orfs_coords(dna_seq, 150, rfs)                                    # 8th exercise
     write_coords_to_file(orf_coords)
     
     annot = sys.argv[2]
-    overlap(orf_coords, annot)                                           # 9th exercise
+    overlap(orf_coords, annot)                                                          # 9th exercise
 
 main()
