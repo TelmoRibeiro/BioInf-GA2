@@ -141,6 +141,7 @@ def all_reading_frames (dna_seq):
     res.append(reading_frame(rc,2))
     return res
 #####################################
+# EXERCISE 7 - as discussed via email, in our implementation we chose to only pick the greater (sizewise) protein in each ORF
 
 def all_proteins_rf(aa_seq):
     current_proteins = []
@@ -181,18 +182,24 @@ def all_orfs_ord(rfs, minimum_size):
                 end_index = i+2
 
                 if abs(end_index - start_index) >= minimum_size:
+                    max_len = 0
+                    max_pro = None
                     for p in all_proteins_rf(translate_seq(rf[start_index:end_index+1])):                 
-                        res.append(p)
+                        if len(p) > max_len:
+                            max_len = len(p)
+                            max_pro = p 
+
+                    insert_protein_ord(max_pro, res)
 
                 start_index = 0
                 first = False
                 end_index = 0
 
-    # print("proteins: " + str(len(res))) #
+    # print("proteins: " + str(len(res))) # just for testing
 
     with open("all_potential_proteins.txt", "w") as fn:
         for orf in res:
-            fn.write(str(orf) + "\n\n")
+            fn.write(str(orf) + "\n")
         fn.close()
 
 ##############################################
