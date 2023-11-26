@@ -1,1 +1,1 @@
-# Assignment2
+# BioInf-GA2
